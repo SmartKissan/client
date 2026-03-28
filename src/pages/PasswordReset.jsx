@@ -4,6 +4,7 @@ import { otpService } from '../services/otpService';
 import OTPInput from '../components/OTPInput';
 import CountdownTimer from '../components/CountdownTimer';
 import { useToast } from '../context/ToastContext';
+import { formatError } from '../utils/errorHandler.js';
 
 const PasswordReset = () => {
   const [searchParams] = useSearchParams();
@@ -20,6 +21,7 @@ const PasswordReset = () => {
   const [isSending, setIsSending] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [verifiedOTP, setVerifiedOTP] = useState(''); // Store verified OTP temporarily
+  const [fieldErrors, setFieldErrors] = useState({});
 
   // Step 1: Send OTP to email
   const handleSendOTP = async () => {
@@ -43,7 +45,16 @@ const PasswordReset = () => {
       setOtpSent(true);
       setStep(2); // Move to OTP verification step
     } catch (error) {
-      toastError(error.response?.data?.message || 'Failed to send OTP');
+      const formattedError = formatError(error);
+      
+      // Set field-specific errors
+      if (formattedError.serverMessage?.toLowerCase().includes('email')) {
+        setFieldErrors({ email: formattedError.message });
+      } else {
+        setFieldErrors({ general: formattedError.message });
+      }
+      
+      toastError(formattedError.message);
     } finally {
       setIsSending(false);
     }
@@ -66,14 +77,23 @@ const PasswordReset = () => {
       setVerifiedOTP(otp); // Store the verified OTP
       setStep(3); // Move to new password step
     } catch (error) {
-      const errorMsg = error.response?.data?.message || 'Invalid OTP';
-      toastError(errorMsg);
+      const formattedError = formatError(error);
+      
+      // Set field-specific errors
+      if (formattedError.serverMessage?.toLowerCase().includes('otp')) {
+        setFieldErrors({ otp: formattedError.message });
+      } else {
+        setFieldErrors({ general: formattedError.message });
+      }
+      
+      toastError(formattedError.message);
       
       // If OTP is wrong, redirect back to email step
       setTimeout(() => {
         setOtp('');
         setOtpSent(false);
         setStep(1);
+        setFieldErrors({});
         toastError('Please request a new OTP');
       }, 2000);
     } finally {

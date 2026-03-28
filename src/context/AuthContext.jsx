@@ -144,7 +144,7 @@ export const AuthProvider = ({ children }) => {
       debug.error('Login failed', error);
       dispatch({
         type: AUTH_ACTIONS.LOGIN_FAILURE,
-        payload: error.response?.data?.message || 'Login failed'
+        payload: error // Pass the entire enhanced error object
       });
       throw error;
     }
@@ -180,7 +180,7 @@ export const AuthProvider = ({ children }) => {
       debug.error('Google login failed', error);
       dispatch({
         type: AUTH_ACTIONS.LOGIN_FAILURE,
-        payload: error.response?.data?.message || 'Google login failed'
+        payload: error // Pass the entire enhanced error object
       });
       throw error;
     }

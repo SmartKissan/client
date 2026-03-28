@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext.jsx';
 import { initializeGoogleAuth, renderGoogleButton, signOutGoogle } from '../utils/googleAuth.js';
 import { authService } from '../services/authService.js';
 import { otpService } from '../services/otpService.js';
+import { formatError } from '../utils/errorHandler.js';
 import debug from '../utils/debug';
 
 const Register = () => {
@@ -18,6 +19,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleAuthReady, setGoogleAuthReady] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   
   // Email verification states
   const [emailVerified, setEmailVerified] = useState(false);
@@ -77,6 +79,7 @@ const Register = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    setFieldErrors({}); // Clear field errors on input
     // Reset email verification if email changes
     if (e.target.name === 'email') {
       setEmailVerified(false);
@@ -98,7 +101,16 @@ const Register = () => {
       setOtpSent(true);
       success('Verification code sent to your email');
     } catch (error) {
-      toastError(error.response?.data?.message || 'Failed to send verification code');
+      const formattedError = formatError(error);
+      
+      // Set field-specific errors
+      if (formattedError.serverMessage?.toLowerCase().includes('email')) {
+        setFieldErrors({ email: formattedError.message });
+      } else {
+        setFieldErrors({ general: formattedError.message });
+      }
+      
+      toastError(formattedError.message);
     } finally {
       setVerifyingEmail(false);
     }
@@ -117,7 +129,16 @@ const Register = () => {
       setEmailVerified(true);
       success('Email verified successfully!');
     } catch (error) {
-      toastError(error.response?.data?.message || 'Invalid verification code');
+      const formattedError = formatError(error);
+      
+      // Set field-specific errors
+      if (formattedError.serverMessage?.toLowerCase().includes('otp')) {
+        setFieldErrors({ otp: formattedError.message });
+      } else {
+        setFieldErrors({ general: formattedError.message });
+      }
+      
+      toastError(formattedError.message);
     } finally {
       setVerifyingOtp(false);
     }
@@ -148,7 +169,18 @@ const Register = () => {
       navigate('/dashboard');
     } catch (error) {
       console.error('Registration error:', error);
-      toastError(error.response?.data?.message || 'Registration failed');
+      const formattedError = formatError(error);
+      
+      // Set field-specific errors
+      if (formattedError.serverMessage?.toLowerCase().includes('email')) {
+        setFieldErrors({ email: formattedError.message });
+      } else if (formattedError.serverMessage?.toLowerCase().includes('password')) {
+        setFieldErrors({ password: formattedError.message });
+      } else {
+        setFieldErrors({ general: formattedError.message });
+      }
+      
+      toastError(formattedError.message);
     } finally {
       setIsLoading(false);
     }

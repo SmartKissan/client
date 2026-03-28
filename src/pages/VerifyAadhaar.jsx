@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { otpService } from '../services/otpService.js';
+import { formatError } from '../utils/errorHandler.js';
 
 const VerifyAadhaar = () => {
   const [aadhaar, setAadhaar] = useState('');
@@ -10,8 +11,9 @@ const VerifyAadhaar = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [fieldErrors, setFieldErrors] = useState({});
   const { user } = useAuth();
-  const { success, error } = useToast();
+  const { success, error: toastError } = useToast();
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -26,6 +28,7 @@ const VerifyAadhaar = () => {
   const sendAadhaarOTP = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
 
     try {
       const response = await otpService.sendAadhaarOTP(aadhaar);
@@ -33,7 +36,16 @@ const VerifyAadhaar = () => {
       setOtpSent(true);
       setTimer(300);
     } catch (err) {
-      error(err.response?.data?.message || 'Failed to send OTP');
+      const formattedError = formatError(err);
+      
+      // Set field-specific errors
+      if (formattedError.serverMessage?.toLowerCase().includes('aadhaar')) {
+        setFieldErrors({ aadhaar: formattedError.message });
+      } else {
+        setFieldErrors({ general: formattedError.message });
+      }
+      
+      toastError(formattedError.message);
     } finally {
       setLoading(false);
     }
@@ -42,13 +54,23 @@ const VerifyAadhaar = () => {
   const verifyAadhaarOTP = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
 
     try {
       await otpService.verifyAadhaarOTP(otp);
       success('Aadhaar verified successfully!');
       navigate('/dashboard');
     } catch (err) {
-      error(err.response?.data?.message || 'Failed to verify OTP');
+      const formattedError = formatError(err);
+      
+      // Set field-specific errors
+      if (formattedError.serverMessage?.toLowerCase().includes('otp')) {
+        setFieldErrors({ otp: formattedError.message });
+      } else {
+        setFieldErrors({ general: formattedError.message });
+      }
+      
+      toastError(formattedError.message);
     } finally {
       setLoading(false);
     }
@@ -77,6 +99,10 @@ const VerifyAadhaar = () => {
 
         {!otpSent ? (
           <form className="mt-8 space-y-6" onSubmit={sendAadhaarOTP}>
+            {fieldErrors.general && (
+              <div className="text-red-600 text-sm text-center">{fieldErrors.general}</div>
+            )}
+            
             <div>
               <label htmlFor="aadhaar" className="block text-sm font-medium text-gray-700">
                 Aadhaar Number
@@ -88,10 +114,16 @@ const VerifyAadhaar = () => {
                 required
                 maxLength={12}
                 value={aadhaar}
-                onChange={(e) => setAadhaar(e.target.value.replace(/\D/g, ''))}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                onChange={(e) => {
+                  setAadhaar(e.target.value.replace(/\D/g, ''));
+                  setFieldErrors({});
+                }}
+                className={`mt-1 block w-full px-3 py-2 border ${fieldErrors.aadhaar ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                 placeholder="123456789012"
               />
+              {fieldErrors.aadhaar && (
+                <div className="text-red-600 text-xs mt-1">{fieldErrors.aadhaar}</div>
+              )}
               <p className="mt-1 text-xs text-gray-500">
                 Enter your 12-digit Aadhaar number
               </p>
@@ -107,6 +139,10 @@ const VerifyAadhaar = () => {
           </form>
         ) : (
           <form className="mt-8 space-y-6" onSubmit={verifyAadhaarOTP}>
+            {fieldErrors.general && (
+              <div className="text-red-600 text-sm text-center">{fieldErrors.general}</div>
+            )}
+            
             <div>
               <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
                 Enter OTP
@@ -118,10 +154,16 @@ const VerifyAadhaar = () => {
                 required
                 maxLength={6}
                 value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-center text-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                onChange={(e) => {
+                  setOtp(e.target.value.replace(/\D/g, ''));
+                  setFieldErrors({});
+                }}
+                className={`mt-1 block w-full px-3 py-2 border ${fieldErrors.otp ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm text-center text-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                 placeholder="000000"
               />
+              {fieldErrors.otp && (
+                <div className="text-red-600 text-xs mt-1">{fieldErrors.otp}</div>
+              )}
               <p className="mt-1 text-xs text-gray-500">
                 Check your email for the 6-digit OTP
               </p>

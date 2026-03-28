@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { profileService } from '../services/profileService';
+import DeleteAccount from '../components/DeleteAccount';
 
 const ProfileView = () => {
   const navigate = useNavigate();
@@ -141,6 +142,14 @@ const ProfileView = () => {
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const handleAccountDeleted = () => {
+    // Clear all auth data
+    localStorage.removeItem('token');
+    setUser(null);
+    // Redirect to home
+    navigate('/');
   };
 
   const getRoleIcon = (role) => {
@@ -555,6 +564,14 @@ const ProfileView = () => {
               >
                 ← Back to Dashboard
               </button>
+            </div>
+
+            {/* Delete Account Section */}
+            <div className="mt-8 pt-6 border-t border-red-200">
+              <DeleteAccount 
+                user={profileData} 
+                onAccountDeleted={handleAccountDeleted}
+              />
             </div>
           </div>
         </div>

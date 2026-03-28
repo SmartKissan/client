@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext.jsx';
 import { initializeGoogleAuth, renderGoogleButton, signOutGoogle } from '../utils/googleAuth.js';
 import { authService } from '../services/authService.js';
 import debug from '../utils/debug';
+import ErrorDisplay from '../components/ErrorDisplay.jsx';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,9 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleAuthReady, setGoogleAuthReady] = useState(false);
-  const { login, googleLogin, error, isAuthenticated } = useAuth();
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [passwordStrength, setPasswordStrength] = useState({});
+  const { login, googleLogin, error, isAuthenticated, clearError } = useAuth();
   const navigate = useNavigate();
   const { success, error: toastError } = useToast();
 
@@ -60,7 +63,28 @@ const Login = () => {
     }
   }, [googleAuthReady]);
 
+  const validatePassword = (password) => {
+    const errors = [];
+    if (password.length < 6 || password.length > 30) errors.push('6-30 characters');
+    if (!/[a-z]/.test(password)) errors.push('one lowercase letter');
+    if (!/[A-Z]/.test(password)) errors.push('one uppercase letter');
+    if (!/\d/.test(password)) errors.push('one number');
+    if (!/[@$!%*?&]/.test(password)) errors.push('one special character (@$!%*?&)');
+    return errors;
+  };
+
   const handleChange = (e) => {
+    clearError(); // Clear error when user starts typing
+    setFieldErrors({}); // Clear field errors
+    
+    if (e.target.name === 'password') {
+      const passwordErrors = validatePassword(e.target.value);
+      setPasswordStrength({
+        isValid: passwordErrors.length === 0,
+        errors: passwordErrors
+      });
+    }
+    
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -70,13 +94,26 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    clearError(); // Clear previous errors
 
     try {
       await login(formData);
       success('Login successful!');
       navigate('/dashboard');
     } catch (error) {
-      toastError(error.response?.data?.message || 'Login failed');
+      // Set field-specific errors
+      if (error.serverMessage) {
+        if (error.serverMessage.includes('email')) {
+          setFieldErrors({ email: error.serverMessage });
+        } else if (error.serverMessage.includes('password')) {
+          setFieldErrors({ password: error.serverMessage });
+        } else {
+          setFieldErrors({ general: error.serverMessage });
+        }
+      } else {
+        setFieldErrors({ general: error.message || 'Login failed' });
+      }
+      toastError(error.message || 'Login failed');
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +122,7 @@ const Login = () => {
   // Handle Google Sign-In response
   const handleGoogleSignIn = async (response) => {
     debug.log('Google Sign-In response received:', response);
+    clearError(); // Clear previous errors
     
     try {
       setGoogleLoading(true);
@@ -142,10 +180,7 @@ const Login = () => {
       
       navigate('/dashboard');
     } catch (error) {
-      debug.error('Google login error:', error);
-      console.error('Full error details:', error);
-      console.error('Error response:', error.response);
-      toastError(error.response?.data?.message || 'Google login failed');
+      toastError(error.message || 'Google login failed');
     } finally {
       setGoogleLoading(false);
     }
@@ -241,10 +276,8 @@ const Login = () => {
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
-              {error}
-            </div>
+          {fieldErrors.general && (
+            <div className="text-red-600 text-sm text-center">{fieldErrors.general}</div>
           )}
           
           <div className="rounded-md shadow-sm -space-y-px">
@@ -258,11 +291,14 @@ const Login = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${fieldErrors.email ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
                 placeholder="Email address"
                 value={formData.email}
                 onChange={handleChange}
               />
+              {fieldErrors.email && (
+                <div className="text-red-600 text-xs mt-1">{fieldErrors.email}</div>
+              )}
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
@@ -274,11 +310,19 @@ const Login = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${fieldErrors.password ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
               />
+              {fieldErrors.password && (
+                <div className="text-red-600 text-xs mt-1">{fieldErrors.password}</div>
+              )}
+              {formData.password && !passwordStrength.isValid && (
+                <div className="text-gray-500 text-xs mt-1">
+                  Password needs: {passwordStrength.errors.join(', ')}
+                </div>
+              )}
             </div>
           </div>
 

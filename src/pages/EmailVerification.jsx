@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { otpService } from '../services/otpService';
 import OTPInput from '../components/OTPInput';
 import CountdownTimer from '../components/CountdownTimer';
+import { formatError } from '../utils/errorHandler.js';
 
 const EmailVerification = () => {
   const [searchParams] = useSearchParams();
@@ -14,7 +15,7 @@ const EmailVerification = () => {
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [success, setSuccess] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -28,12 +29,12 @@ const EmailVerification = () => {
 
   const handleSendOTP = async () => {
     if (!email) {
-      setError('Email is required');
+      setFieldErrors({ email: 'Email is required' });
       return;
     }
 
     setIsSending(true);
-    setError('');
+    setFieldErrors({});
     setSuccess('');
 
     try {
@@ -41,7 +42,14 @@ const EmailVerification = () => {
       setSuccess('OTP sent to your email successfully!');
       setOtpSent(true);
     } catch (error) {
-      setError(error.response?.data?.message || 'Failed to send OTP');
+      const formattedError = formatError(error);
+      
+      // Set field-specific errors
+      if (formattedError.serverMessage?.toLowerCase().includes('email')) {
+        setFieldErrors({ email: formattedError.message });
+      } else {
+        setFieldErrors({ general: formattedError.message });
+      }
     } finally {
       setIsSending(false);
     }
@@ -49,12 +57,12 @@ const EmailVerification = () => {
 
   const handleVerifyOTP = async () => {
     if (otp.length !== 6) {
-      setError('Please enter a 6-digit OTP');
+      setFieldErrors({ otp: 'Please enter a 6-digit OTP' });
       return;
     }
 
     setIsVerifying(true);
-    setError('');
+    setFieldErrors({});
     setSuccess('');
 
     try {
@@ -66,21 +74,28 @@ const EmailVerification = () => {
         navigate('/dashboard');
       }, 2000);
     } catch (error) {
-      setError(error.response?.data?.message || 'Invalid OTP');
+      const formattedError = formatError(error);
+      
+      // Set field-specific errors
+      if (formattedError.serverMessage?.toLowerCase().includes('otp')) {
+        setFieldErrors({ otp: formattedError.message });
+      } else {
+        setFieldErrors({ general: formattedError.message });
+      }
     } finally {
       setIsVerifying(false);
     }
   };
 
   const handleOTPExpire = () => {
-    setError('OTP has expired. Please request a new one.');
+    setFieldErrors({ general: 'OTP has expired. Please request a new one.' });
     setOtp('');
     setOtpSent(false);
   };
 
   const handleResendOTP = () => {
     setOtp('');
-    setError('');
+    setFieldErrors({});
     setSuccess('');
     handleSendOTP();
   };

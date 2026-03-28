@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { STORAGE_KEYS } from '../constants/apiEndpoints';
+import { formatError } from '../utils/errorHandler';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
+const API_BASE_URL = import.meta.env.PROD 
+  ? 'https://smartkissann.vercel.app/api/v1' 
+  : 'http://localhost:8080/api/v1';
 
 // Create axios instance
 const api = axios.create({
@@ -61,11 +64,12 @@ api.interceptors.response.use(
           console.log('Redirecting to login due to authentication failure');
           window.location.href = '/login';
         }
-        return Promise.reject(refreshError);
+        return Promise.reject(formatError(refreshError));
       }
     }
 
-    return Promise.reject(error);
+    // Format and enhance error before rejecting
+    return Promise.reject(formatError(error));
   }
 );
 
