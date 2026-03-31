@@ -1,258 +1,1010 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar.jsx';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { 
+  ShoppingCart, 
+  Globe, 
+  Sun, 
+  Moon, 
+  Menu, 
+  X,
+  Link as LinkIcon,
+  Wifi,
+  FileText,
+  TrendingUp,
+  Mic,
+  Award,
+  Users,
+  Target,
+  Heart,
+  ArrowRight,
+  Truck,
+  Shield,
+  Smartphone,
+  Star,
+  MapPin,
+  Package
+} from 'lucide-react';
 
 const Home = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 via-emerald-800 to-teal-900">
-      <Navbar />
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const navigate = useNavigate();
+
+  // Refs for sections
+  const homeRef = useRef(null);
+  const featuresRef = useRef(null);
+  const marketplaceRef = useRef(null);
+  const howItWorksRef = useRef(null);
+  const aboutRef = useRef(null);
+
+  const features = [
+    {
+      icon: LinkIcon,
+      title: "Blockchain Provenance",
+      description: "Every transaction and product movement is recorded on an immutable blockchain ledger ensuring complete transparency."
+    },
+    {
+      icon: Wifi,
+      title: "IoT Monitoring (in future)",
+      description: "Real-time monitoring of product conditions (temperature, humidity) throughout the supply chain journey."
+    },
+    {
+      icon: FileText,
+      title: "Smart Contracts",
+      description: "Automated escrow payments and quality verification through tamper-proof smart contracts."
+    },
+    {
+      icon: TrendingUp,
+      title: "AI Fraud Detection",
+      description: "Machine learning algorithms monitor transactions for anomalies and potential fraud."
+    },
+    {
+      icon: Mic,
+      title: "Voice Interface (in future)",
+      description: "Voice commands and multilingual support for farmers with limited digital literacy."
+    },
+    {
+      icon: Award,
+      title: "Sustainability Rewards",
+      description: "Farmers earn tokens for sustainable practices that can be redeemed for benefits."
+    }
+  ];
+
+  const steps = [
+    {
+      number: "1",
+      icon: Users,
+      title: "Create Account",
+      description: "Sign up as a farmer, buyer, or logistics provider with email verification and Aadhaar authentication."
+    },
+    {
+      number: "2", 
+      icon: ShoppingCart,
+      title: "Browse Marketplace",
+      description: "Explore available products, connect with verified partners, and discover new opportunities."
+    },
+    {
+      number: "3",
+      icon: Shield,
+      title: "Secure Transactions",
+      description: "Execute smart contracts with escrow protection and blockchain-based provenance tracking."
+    },
+    {
+      number: "4",
+      icon: Truck,
+      title: "Logistics & Delivery",
+      description: "Coordinate transportation and delivery with trusted logistics partners in real-time."
+    }
+  ];
+
+  const values = [
+    {
+      icon: Target,
+      title: "Mission",
+      description: "To empower farmers and revolutionize agricultural supply chains through technology, transparency, and trust."
+    },
+    {
+      icon: Award,
+      title: "Vision", 
+      description: "To create a global agricultural ecosystem where every farmer has direct access to markets and fair prices."
+    },
+    {
+      icon: Heart,
+      title: "Values",
+      description: "Transparency, fairness, innovation, and sustainability guide everything we do at AgriChain."
+    }
+  ];
+
+  const stats = [
+    { number: "10,000+", label: "Farmers Connected" },
+    { number: "50,000+", label: "Active Buyers" },
+    { number: "₹100Cr+", label: "Transactions Processed" },
+    { number: "25+", label: "States Covered" }
+  ];
+
+  // Mouse tracking effect
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Scroll detection for navbar transparency and active section
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 100;
       
-      {/* Hero Section with Glassmorphism */}
-      <div className="relative pt-20 sm:pt-24 lg:pt-32 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-500/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-1/2 -left-20 w-60 h-60 bg-emerald-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
-        </div>
+      // Update navbar transparency
+      setIsScrolled(window.scrollY > 20);
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100vh-8rem)]">
-            {/* Left Content */}
-            <div className="text-center lg:text-left z-10">
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-green-200 text-sm font-medium mb-6">
-                <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-                Empowering Farmers
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
-                <span className="block">Grow with</span>
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300">
-                  Smart Kissan
+      // Update active section
+      if (aboutRef.current && scrollPosition >= aboutRef.current.offsetTop) {
+        setActiveSection('about');
+      } else if (howItWorksRef.current && scrollPosition >= howItWorksRef.current.offsetTop) {
+        setActiveSection('how-it-works');
+      } else if (marketplaceRef.current && scrollPosition >= marketplaceRef.current.offsetTop) {
+        setActiveSection('marketplace');
+      } else if (featuresRef.current && scrollPosition >= featuresRef.current.offsetTop) {
+        setActiveSection('features');
+      } else {
+        setActiveSection('home');
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (sectionRef, sectionName) => {
+    sectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setActiveSection(sectionName);
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 relative overflow-hidden">
+      {/* Interactive Mouse Follow Effect - Smaller Size */}
+      <div 
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{
+          background: `radial-gradient(circle 300px at ${mousePosition.x}px ${mousePosition.y}px, rgba(34, 197, 94, 0.08), transparent 40%)`,
+        }}
+      />
+      
+      {/* Animated Background Elements - Subtle */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-br from-emerald-100/20 to-green-100/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-tl from-teal-100/20 to-emerald-100/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/3 right-1/3 w-72 h-72 bg-gradient-to-r from-green-100/15 to-emerald-100/15 rounded-full blur-3xl animate-pulse delay-500"></div>
+        
+        {/* Floating Particles - Smaller & Subtler */}
+        {[...Array(4)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-3 h-3 bg-gradient-to-br from-emerald-300/20 to-green-400/20 rounded-full animate-bounce"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${4 + Math.random() * 3}s`
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* Navigation Bar */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled 
+          ? 'bg-white/70 backdrop-blur-xl border-b border-green-200/30 shadow-lg shadow-green-500/10' 
+          : 'bg-white/50 backdrop-blur-lg border-b border-green-200/20'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo - Text Only */}
+            <div className="flex items-center">
+              <button 
+                onClick={() => scrollToSection(homeRef, 'home')}
+                className="flex items-center space-x-2"
+              >
+                <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                  SmartKissan
                 </span>
-              </h1>
-              
-              <p className="mt-6 text-lg sm:text-xl text-green-100/80 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                Connect directly with buyers, manage logistics, and transform your agricultural business with our cutting-edge digital platform.
-              </p>
-              
-              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Link
-                  to="/register"
-                  className="group relative inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-bold text-green-900 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl overflow-hidden shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 hover:-translate-y-1"
-                >
-                  <span className="relative z-10 flex items-center">
-                    Get Started Free
-                    <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </Link>
-                
-                <Link
-                  to="/login"
-                  className="inline-flex items-center justify-center px-8 py-4 text-base sm:text-lg font-semibold text-white bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-2xl hover:bg-white/20 hover:border-white/50 transition-all duration-300"
-                >
-                  Sign In
-                </Link>
-              </div>
+              </button>
+            </div>
 
-              {/* Stats */}
-              <div className="mt-12 grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto lg:mx-0">
-                {[
-                  { value: '10K+', label: 'Farmers' },
-                  { value: '50K+', label: 'Buyers' },
-                  { value: '₹100Cr+', label: 'Transactions' },
-                ].map((stat, index) => (
-                  <div key={index} className="text-center">
-                    <div className="text-2xl sm:text-3xl font-bold text-yellow-400">{stat.value}</div>
-                    <div className="text-sm text-green-200/70">{stat.label}</div>
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8 relative">
+              <button 
+                onClick={() => scrollToSection(homeRef, 'home')}
+                className={`text-gray-700 hover:text-green-600 font-medium transition-colors py-5 px-1 ${
+                  activeSection === 'home' ? 'text-green-600' : ''
+                }`}
+              >
+                Home
+              </button>
+              <button 
+                onClick={() => scrollToSection(featuresRef, 'features')}
+                className={`text-gray-700 hover:text-green-600 font-medium transition-colors py-5 px-1 ${
+                  activeSection === 'features' ? 'text-green-600' : ''
+                }`}
+              >
+                Features
+              </button>
+              <button 
+                onClick={() => scrollToSection(marketplaceRef, 'marketplace')}
+                className={`text-gray-700 hover:text-green-600 font-medium transition-colors py-5 px-1 ${
+                  activeSection === 'marketplace' ? 'text-green-600' : ''
+                }`}
+              >
+                Marketplace
+              </button>
+              <button 
+                onClick={() => scrollToSection(howItWorksRef, 'how-it-works')}
+                className={`text-gray-700 hover:text-green-600 font-medium transition-colors py-5 px-1 ${
+                  activeSection === 'how-it-works' ? 'text-green-600' : ''
+                }`}
+              >
+                How It Works
+              </button>
+              <button 
+                onClick={() => scrollToSection(aboutRef, 'about')}
+                className={`text-gray-700 hover:text-green-600 font-medium transition-colors py-5 px-1 ${
+                  activeSection === 'about' ? 'text-green-600' : ''
+                }`}
+              >
+                About
+              </button>
+              
+              {/* Moving Underline - Centered below nav items */}
+              <div 
+                className="absolute bottom-0 h-0.5 bg-green-600 transition-all duration-300 ease-in-out"
+                style={{
+                  width: activeSection === 'home' ? '40px' : 
+                         activeSection === 'features' ? '60px' :
+                         activeSection === 'marketplace' ? '88px' :
+                         activeSection === 'how-it-works' ? '100px' : 
+                         activeSection === 'about' ? '40px' : '0px',
+                  left: activeSection === 'home' ? '0px' : 
+                        activeSection === 'features' ? '64px' : 
+                        activeSection === 'marketplace' ? '152px' :
+                        activeSection === 'how-it-works' ? '240px' : 
+                        activeSection === 'about' ? '340px' : '0px',
+                }}
+              />
+            </div>
+
+            {/* Right Side Items */}
+            <div className="flex items-center space-x-4">
+              {/* Cart Icon */}
+              <button className="text-gray-600 hover:text-green-600 transition-colors">
+                <ShoppingCart className="w-5 h-5" />
+              </button>
+
+              {/* Language Icon (Placeholder) */}
+              <button className="text-gray-600 hover:text-green-600 transition-colors">
+                <Globe className="w-5 h-5" />
+              </button>
+
+              {/* Dark Mode Toggle */}
+              <button 
+                onClick={toggleDarkMode}
+                className="text-gray-600 hover:text-green-600 transition-colors"
+              >
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+
+              {/* Auth Buttons */}
+              <Link 
+                to="/login"
+                className="px-4 py-2 text-gray-700 font-medium hover:text-gray-900 transition-colors"
+              >
+                Login
+              </Link>
+              <Link 
+                to="/register"
+                className="px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Register
+              </Link>
+
+              {/* Mobile Menu Button */}
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden text-gray-600 hover:text-green-600 transition-colors"
+              >
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t border-gray-200 -mx-4 px-4 py-4">
+              <div className="flex flex-col space-y-4">
+                <button 
+                  onClick={() => {
+                    scrollToSection(homeRef, 'home');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`text-gray-700 hover:text-green-600 font-medium transition-colors text-left ${
+                    activeSection === 'home' ? 'text-green-600' : ''
+                  }`}
+                >
+                  Home
+                </button>
+                <button 
+                  onClick={() => {
+                    scrollToSection(featuresRef, 'features');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`text-gray-700 hover:text-green-600 font-medium transition-colors text-left ${
+                    activeSection === 'features' ? 'text-green-600' : ''
+                  }`}
+                >
+                  Features
+                </button>
+                <button 
+                  onClick={() => {
+                    scrollToSection(marketplaceRef, 'marketplace');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`text-gray-700 hover:text-green-600 font-medium transition-colors text-left ${
+                    activeSection === 'marketplace' ? 'text-green-600' : ''
+                  }`}
+                >
+                  Marketplace
+                </button>
+                <button 
+                  onClick={() => {
+                    scrollToSection(howItWorksRef, 'how-it-works');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`text-gray-700 hover:text-green-600 font-medium transition-colors text-left ${
+                    activeSection === 'how-it-works' ? 'text-green-600' : ''
+                  }`}
+                >
+                  How It Works
+                </button>
+                <button 
+                  onClick={() => {
+                    scrollToSection(aboutRef, 'about');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`text-gray-700 hover:text-green-600 font-medium transition-colors text-left ${
+                    activeSection === 'about' ? 'text-green-600' : ''
+                  }`}
+                >
+                  About
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </nav>
+      {/* Main Content */}
+      <main className="pt-16 relative z-10">
+        {/* Home Section */}
+        <section ref={homeRef} className="h-screen flex items-center justify-center px-2 sm:px-4 md:px-6 lg:px-8 pt-0">
+          <div className="max-w-7xl mx-auto w-full flex items-center justify-center">
+            <div className="text-center relative w-full">
+              {/* Watery Glass Card Container */}
+              <div className="bg-white/10 backdrop-blur-3xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10 shadow-2xl shadow-black/5 border border-white/20 relative overflow-hidden mx-auto max-w-6xl lg:max-w-5xl">
+                {/* Watery Effect Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl sm:rounded-3xl"></div>
+                
+                {/* Decorative Elements */}
+                <div className="absolute top-0 left-0 w-32 sm:w-40 h-32 sm:h-40 bg-gradient-to-br from-emerald-100/10 to-green-100/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 right-0 w-40 sm:w-48 h-40 sm:h-48 bg-gradient-to-tl from-teal-100/10 to-emerald-100/10 rounded-full blur-3xl"></div>
+                
+                {/* Content */}
+                <div className="relative z-10 flex flex-col items-center justify-center">
+                  <div className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 backdrop-blur-sm rounded-full mb-3 sm:mb-4 border border-white/20 shadow-lg shadow-black/5">
+                    <span className="text-emerald-700 font-semibold text-xs sm:text-sm">🌱 Revolutionizing Agriculture</span>
                   </div>
-                ))}
+                  
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 leading-tight text-center">
+                    <span className="block mb-1 sm:mb-2 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent drop-shadow-lg">
+                      Transforming
+                    </span>
+                    <span className="block bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-transparent drop-shadow-lg">
+                      Agriculture
+                    </span>
+                    <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl mt-2 sm:mt-3 bg-gradient-to-r from-emerald-700 to-green-700 bg-clip-text text-transparent font-semibold">
+                      with SmartKissan
+                    </span>
+                  </h1>
+                  
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-800 max-w-3xl sm:max-w-4xl mx-auto mb-6 sm:mb-8 leading-relaxed font-medium text-center px-2 sm:px-0">
+                    Connect directly with farmers, ensure fair prices, and revolutionize the agricultural supply chain with 
+                    <span className="text-emerald-600 font-bold"> blockchain technology</span> and 
+                    <span className="text-green-600 font-bold"> transparent transactions</span>
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center items-center">
+                    <button 
+                      onClick={() => scrollToSection(featuresRef, 'features')}
+                      className="group px-4 sm:px-6 md:px-8 py-2 sm:py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold rounded-xl sm:rounded-2xl hover:from-emerald-600 hover:to-green-600 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/25 backdrop-blur-sm border border-white/20 text-sm sm:text-base"
+                    >
+                      <span className="flex items-center space-x-1 sm:space-x-2">
+                        <span>Explore Features</span>
+                        <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                      </span>
+                    </button>
+                    <button 
+                      onClick={() => scrollToSection(marketplaceRef, 'marketplace')}
+                      className="group px-4 sm:px-6 md:px-8 py-2 sm:py-3 bg-white/10 backdrop-blur-xl text-gray-800 font-bold rounded-xl sm:rounded-2xl hover:bg-white/20 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-black/10 border border-white/30 text-sm sm:text-base"
+                    >
+                      <span className="flex items-center space-x-1 sm:space-x-2">
+                        <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span>Visit Marketplace</span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Floating Elements - Responsive */}
+              <div className="absolute -top-8 sm:-top-12 -left-8 sm:-left-12 w-12 sm:w-16 h-12 sm:h-16 bg-gradient-to-br from-emerald-200/20 to-green-300/20 rounded-full blur-2xl animate-bounce"></div>
+              <div className="absolute -bottom-8 sm:-bottom-12 -right-8 sm:-right-12 w-16 sm:w-20 h-16 sm:h-20 bg-gradient-to-tl from-teal-200/20 to-emerald-300/20 rounded-full blur-2xl animate-bounce delay-500"></div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section ref={featuresRef} className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+          {/* Header Section */}
+          <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6">
+              Powerful Features
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-3xl sm:max-w-4xl mx-auto font-medium px-2 sm:px-0">
+              SmartKissan combines cutting-edge technologies to revolutionize agricultural supply chains
+            </p>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div 
+                  key={index}
+                  className="group bg-white/5 backdrop-blur-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 hover:bg-white/10 transition-all duration-700 transform hover:scale-105 hover:shadow-2xl hover:shadow-black/10 border border-white/15 relative overflow-hidden"
+                >
+                  {/* Watery Effect Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/3 via-transparent to-white/3 rounded-2xl sm:rounded-3xl"></div>
+                  
+                  {/* Decorative gradient */}
+                  <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-gradient-to-bl from-emerald-100/10 to-green-100/10 rounded-full blur-2xl"></div>
+                  
+                  <div className="relative z-10">
+                    <div className="w-12 sm:w-14 md:w-16 h-12 sm:h-14 md:h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-xl shadow-black/10 group-hover:shadow-emerald-500/30 transition-all duration-500 group-hover:scale-110">
+                      <Icon className="w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 text-white" />
+                    </div>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 lg:mb-6 group-hover:text-emerald-700 transition-colors duration-300">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Marketplace Section */}
+        <section ref={marketplaceRef} className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Header */}
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Agricultural Marketplace
+              </h2>
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                Connect directly with verified farmers and get fresh, quality produce at fair prices
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              <div className="text-center p-6 bg-white rounded-xl">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Package className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">2,500+</div>
+                <div className="text-sm text-gray-600">Active Listings</div>
+              </div>
+              <div className="text-center p-6 bg-white rounded-xl">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Users className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">10,000+</div>
+                <div className="text-sm text-gray-600">Verified Farmers</div>
+              </div>
+              <div className="text-center p-6 bg-white rounded-xl">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Truck className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">50,000+</div>
+                <div className="text-sm text-gray-600">Completed Orders</div>
+              </div>
+              <div className="text-center p-6 bg-white rounded-xl">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Shield className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">₹100Cr+</div>
+                <div className="text-sm text-gray-600">Secure Transactions</div>
               </div>
             </div>
 
-            {/* Right Content - Hero Image/Graphic */}
-            <div className="relative hidden lg:flex items-center justify-center">
-              <div className="relative w-full max-w-lg">
-                {/* Glass Card */}
-                <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
-                  <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
-                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-4 bg-white/5 rounded-xl p-4">
-                      <div className="w-12 h-12 bg-green-500/30 rounded-xl flex items-center justify-center">
-                        <svg className="w-6 h-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="text-white font-semibold">Direct Sales</div>
-                        <div className="text-green-200/70 text-sm">No middlemen, better prices</div>
+            {/* Featured Products */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow duration-300">
+                <div className="flex items-start space-x-4">
+                  <div className="text-4xl">🌾</div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900">Premium Basmati Rice</h3>
+                      <div className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+                        Certified
                       </div>
                     </div>
-                    
-                    <div className="flex items-center space-x-4 bg-white/5 rounded-xl p-4">
-                      <div className="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center">
-                        <svg className="w-6 h-6 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="flex items-center">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-sm text-gray-600 ml-1">4.8</span>
                       </div>
-                      <div>
-                        <div className="text-white font-semibold">Verified Trust</div>
-                        <div className="text-green-200/70 text-sm">Aadhaar verified profiles</div>
+                      <span className="text-sm text-gray-400">(124 reviews)</span>
+                    </div>
+                    <div className="space-y-1 mb-3">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        Punjab
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Users className="w-3 h-3 mr-1" />
+                        Rajesh Kumar
                       </div>
                     </div>
-                    
-                    <div className="flex items-center space-x-4 bg-white/5 rounded-xl p-4">
-                      <div className="w-12 h-12 bg-purple-500/30 rounded-xl flex items-center justify-center">
-                        <svg className="w-6 h-6 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                      </div>
+                    <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-white font-semibold">Fast Logistics</div>
-                        <div className="text-green-200/70 text-sm">Quick & safe transport</div>
+                        <span className="text-2xl font-bold text-green-600">₹85/kg</span>
                       </div>
+                      <button className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+                        Contact Farmer
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Features Section with Glass Cards */}
-      <div className="py-16 sm:py-24 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
-            <span className="text-green-300 font-semibold tracking-wider uppercase text-sm">Features</span>
-            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold text-white">
-              Everything You Need to <span className="text-yellow-400">Succeed</span>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow duration-300">
+                <div className="flex items-start space-x-4">
+                  <div className="text-4xl">🍅</div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900">Fresh Tomatoes</h3>
+                      <div className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+                        Certified
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="flex items-center">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-sm text-gray-600 ml-1">4.6</span>
+                      </div>
+                      <span className="text-sm text-gray-400">(89 reviews)</span>
+                    </div>
+                    <div className="space-y-1 mb-3">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        Maharashtra
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Users className="w-3 h-3 mr-1" />
+                        Amit Singh
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-2xl font-bold text-green-600">₹40/kg</span>
+                      </div>
+                      <button className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+                        Contact Farmer
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Marketplace Section */}
+        <section ref={marketplaceRef} className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+          {/* Header Section */}
+          <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6">
+              Farmers Marketplace
             </h2>
-            <p className="mt-4 text-lg text-green-100/70 max-w-2xl mx-auto">
-              Powerful tools designed specifically for the modern farmer
+            <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-3xl sm:max-w-4xl mx-auto font-medium px-2 sm:px-0">
+              Browse fresh produce directly from local farmers at fair prices
             </p>
           </div>
 
+          {/* Product Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {[
-              {
-                icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-                title: 'Direct Marketplace',
-                desc: 'Connect directly with buyers and sellers. Eliminate middlemen and get better prices for your produce.',
-                color: 'from-green-400/20 to-emerald-500/20',
-                iconColor: 'text-green-400'
-              },
-              {
-                icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-                title: 'Verified Profiles',
-                desc: 'Aadhaar verified profiles ensure trust and security in all your transactions and partnerships.',
-                color: 'from-blue-400/20 to-cyan-500/20',
-                iconColor: 'text-blue-400'
-              },
-              {
-                icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-                title: 'Fast Logistics',
-                desc: 'Integrated logistics support to transport your goods quickly, safely, and cost-effectively.',
-                color: 'from-purple-400/20 to-pink-500/20',
-                iconColor: 'text-purple-400'
-              },
-              {
-                icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-                title: 'Analytics Dashboard',
-                desc: 'Track your sales, monitor market trends, and make data-driven decisions for your farm.',
-                color: 'from-yellow-400/20 to-orange-500/20',
-                iconColor: 'text-yellow-400'
-              },
-              {
-                icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-                title: 'Secure Payments',
-                desc: 'Safe and transparent payment processing with multiple payment options available.',
-                color: 'from-red-400/20 to-rose-500/20',
-                iconColor: 'text-red-400'
-              },
-              {
-                icon: 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zM12 3v9m0 0v9m0-9h9m-9 0H3',
-                title: '24/7 Support',
-                desc: 'Round-the-clock customer support to help you with any issues or questions.',
-                color: 'from-teal-400/20 to-cyan-500/20',
-                iconColor: 'text-teal-400'
-              }
-            ].map((feature, index) => (
-              <div
-                key={index}
-                className="group relative bg-white/5 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:-translate-y-2"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl sm:rounded-3xl`}></div>
-                <div className="relative">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <svg className={`w-7 h-7 sm:w-8 sm:h-8 ${feature.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={feature.icon} />
-                    </svg>
+            {marketplaceProducts.map((product, index) => (
+              <div key={index} className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                <div className="h-48 sm:h-56 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+                  <Package className="w-16 sm:w-20 h-16 sm:h-20 text-green-600" />
+                </div>
+                <div className="p-4 sm:p-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
+                  <div className="space-y-1 mb-3 sm:mb-4">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <span className="text-xs sm:text-sm">{product.location}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <span className="text-xs sm:text-sm">{product.farmer}</span>
+                    </div>
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-green-100/70 leading-relaxed text-sm sm:text-base">{feature.desc}</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xl sm:text-2xl font-bold text-green-600">{product.price}</span>
+                    </div>
+                    <button className="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+                      Contact Farmer
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* CTA Section */}
-      <div className="py-16 sm:py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-green-600/20 to-emerald-600/20"></div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/10 backdrop-blur-xl rounded-3xl sm:rounded-[2.5rem] p-8 sm:p-12 lg:p-16 border border-white/20 text-center">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6">
-              Ready to Transform Your <span className="text-yellow-400">Farm Business</span>?
-            </h2>
-            <p className="text-lg sm:text-xl text-green-100/80 mb-8 max-w-2xl mx-auto">
-              Join thousands of farmers and buyers already using Smart Kissan to grow their agricultural business.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/register"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-green-900 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl hover:from-yellow-300 hover:to-yellow-400 shadow-2xl hover:shadow-yellow-500/30 transition-all duration-300 hover:-translate-y-1"
-              >
-                Start For Free
-                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white border-2 border-white/30 rounded-2xl hover:bg-white/10 hover:border-white/50 transition-all duration-300"
-              >
-                Sign In
-              </Link>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow duration-300">
+                <div className="flex items-start space-x-4">
+                  <div className="text-4xl">🧡</div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900">Organic Turmeric</h3>
+                      <div className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+                        Certified
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="flex items-center">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-sm text-gray-600 ml-1">4.9</span>
+                      </div>
+                      <span className="text-sm text-gray-400">(156 reviews)</span>
+                    </div>
+                    <div className="space-y-1 mb-3">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        Karnataka
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Users className="w-3 h-3 mr-1" />
+                        Lakshmi Reddy
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-2xl font-bold text-green-600">₹180/kg</span>
+                      </div>
+                      <button className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+                        Contact Farmer
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Section */}
+            <div className="text-center bg-white rounded-xl p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Ready to Start Selling?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Join thousands of farmers already selling their produce on SmartKissan
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link 
+                  to="/register"
+                  className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Register as Farmer
+                </Link>
+                <Link 
+                  to="/register"
+                  className="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Register as Buyer
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section ref={howItWorksRef} className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Header */}
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                How It Works
+              </h2>
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                Simple steps to transform your agricultural supply chain with SmartKissan
+              </p>
+            </div>
+
+            {/* Steps Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+              {steps.map((step, index) => {
+                const Icon = step.icon;
+                return (
+                  <div 
+                    key={index}
+                    className="flex items-start space-x-6 p-6 bg-white rounded-xl hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
+                        {step.number}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <Icon className="w-6 h-6 text-green-600" />
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          {step.title}
+                        </h3>
+                      </div>
+                      <p className="text-gray-600 leading-relaxed">
+                        {step.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* CTA Section */}
+            <div className="text-center bg-white rounded-xl p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
+                Ready to Get Started?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Join thousands of farmers and buyers already using SmartKissan
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link 
+                  to="/register"
+                  className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Create Account
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+                <Link 
+                  to="/marketplace"
+                  className="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Browse Marketplace
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* About Section */}
+        <section ref={aboutRef} className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Header */}
+            <div className="text-center py-12">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                About SmartKissan
+              </h2>
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                We're building the future of agricultural supply chains with technology, trust, and transparency
+              </p>
+            </div>
+
+            {/* Stats Section */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+              {stats.map((stat, index) => (
+                <div key={index} className="text-center p-6 bg-gray-50 rounded-xl">
+                  <div className="text-3xl font-bold text-green-600 mb-2">{stat.number}</div>
+                  <div className="text-sm text-gray-600">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Values Section */}
+            <div className="mb-16">
+              <h3 className="text-3xl font-bold text-gray-900 text-center mb-12">
+                Our Core Values
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {values.map((value, index) => {
+                  const Icon = value.icon;
+                  return (
+                    <div 
+                      key={index}
+                      className="text-center p-8 bg-gray-50 rounded-xl hover:shadow-lg transition-shadow duration-300"
+                    >
+                      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Icon className="w-8 h-8 text-green-600" />
+                      </div>
+                      <h4 className="text-xl font-semibold text-gray-900 mb-3">
+                        {value.title}
+                      </h4>
+                      <p className="text-gray-600 leading-relaxed">
+                        {value.description}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Story Section */}
+            <div className="bg-gray-50 rounded-xl p-8 mb-16">
+              <h3 className="text-3xl font-bold text-gray-900 mb-6">
+                Our Story
+              </h3>
+              <div className="prose prose-lg text-gray-600 max-w-none">
+                <p className="mb-4">
+                  SmartKissan was born from a simple observation: farmers deserve better. We saw hardworking farmers 
+                  struggling with complex supply chains, middlemen taking unfair cuts, and lack of direct market access.
+                </p>
+                <p className="mb-4">
+                  Founded in 2024, our mission was to leverage blockchain technology, smart contracts, and modern 
+                  logistics to create a transparent, efficient agricultural marketplace. We wanted to put power back 
+                  into the hands of those who feed our nation.
+                </p>
+                <p>
+                  Today, SmartKissan connects thousands of farmers directly with buyers, ensuring fair prices, 
+                  secure transactions, and complete transparency. We're not just building a platform; we're 
+                  building a movement to transform Indian agriculture.
+                </p>
+              </div>
+            </div>
+
+            {/* CTA Section */}
+            <div className="text-center bg-white rounded-xl p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Join Us in Revolutionizing Agriculture
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Whether you're a farmer, buyer, or logistics partner, there's a place for you in SmartKissan
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link 
+                  to="/register"
+                  className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Join SmartKissan Today
+                </Link>
+                <Link 
+                  to="/contact"
+                  className="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Contact Us
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center">
-                <svg className="w-6 h-6 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.072 0 1 1 0 000 1.415z" clipRule="evenodd" />
-                </svg>
+      <footer className="bg-gray-900 text-white mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Company Info */}
+            <div className="col-span-1 md:col-span-2">
+              <div className="mb-4">
+                <span className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                  SmartKissan
+                </span>
               </div>
-              <span className="text-xl font-bold text-white">Smart Kissan</span>
+              <p className="text-gray-300 mb-4 max-w-md">
+                Revolutionizing agricultural supply chains through blockchain technology, connecting farmers directly with buyers for fair prices and complete transparency.
+              </p>
+              <div className="flex space-x-4">
+                <button className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors">
+                  <Globe className="w-5 h-5" />
+                </button>
+                <button className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors">
+                  <ShoppingCart className="w-5 h-5" />
+                </button>
+                <button className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors">
+                  <Users className="w-5 h-5" />
+                </button>
+              </div>
             </div>
-            <p className="text-green-200/60 text-sm">
-              © 2024 Smart Kissan. All rights reserved.
-            </p>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+              <ul className="space-y-2">
+                <li>
+                  <button 
+                    onClick={() => scrollToSection(homeRef, 'home')}
+                    className="text-gray-300 hover:text-green-400 transition-colors"
+                  >
+                    Home
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => scrollToSection(featuresRef, 'features')}
+                    className="text-gray-300 hover:text-green-400 transition-colors"
+                  >
+                    Features
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => scrollToSection(marketplaceRef, 'marketplace')}
+                    className="text-gray-300 hover:text-green-400 transition-colors"
+                  >
+                    Marketplace
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => scrollToSection(howItWorksRef, 'how-it-works')}
+                    className="text-gray-300 hover:text-green-400 transition-colors"
+                  >
+                    How It Works
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact Info */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
+              <ul className="space-y-2 text-gray-300">
+                <li className="flex items-center space-x-2">
+                  <MapPin className="w-4 h-4" />
+                  <span>New Delhi, India</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Globe className="w-4 h-4" />
+                  <span>support@agrichain.com</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Smartphone className="w-4 h-4" />
+                  <span>+91 98765 43210</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 mt-8 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-gray-400 text-sm mb-4 md:mb-0">
+                &copy; 2026 SmartKissan. All rights reserved.
+              </p>
+              <p className="text-gray-400 text-sm">
+                Made with ❤️ by <span className="text-green-400 font-semibold">SmartKissan</span> • Empowering Indian Farmers
+              </p>
+            </div>
           </div>
         </div>
       </footer>

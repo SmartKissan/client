@@ -12,6 +12,9 @@ import EmailVerification from './pages/EmailVerification.jsx';
 import VerifyAadhaar from './pages/VerifyAadhaar.jsx';
 import PasswordReset from './pages/PasswordReset.jsx';
 import Profile from './pages/ProfileView.jsx';
+import HowItWorks from './pages/HowItWorks.jsx';
+import About from './pages/About.jsx';
+import Marketplace from './pages/Marketplace.jsx';
 import './App.css';
 
 function App() {
@@ -31,6 +34,9 @@ function App() {
                 <Route path="/verify-aadhaar" element={<VerifyAadhaar />} />
                 <Route path="/reset-password" element={<PasswordReset />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/how-it-works" element={<HowItWorks />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/marketplace" element={<Marketplace />} />
               </Routes>
             </div>
           </Router>
