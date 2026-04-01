@@ -15,6 +15,8 @@ import Profile from './pages/ProfileView.jsx';
 import HowItWorks from './pages/HowItWorks.jsx';
 import About from './pages/About.jsx';
 import Marketplace from './pages/Marketplace.jsx';
+import Wallet from './pages/Wallet.jsx';
+import AddBankAccount from './pages/AddBankAccount.jsx';
 import './App.css';
 
 function App() {
@@ -37,6 +39,8 @@ function App() {
                 <Route path="/how-it-works" element={<HowItWorks />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/marketplace" element={<Marketplace />} />
+                <Route path="/wallet" element={<Wallet />} />
+                <Route path="/add-bank-account" element={<AddBankAccount />} />
               </Routes>
             </div>
           </Router>
