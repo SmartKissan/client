@@ -536,7 +536,7 @@ const ProfileView = () => {
                 </div>
               </div>
 
-              <div className="mt-4 flex gap-3">
+              <div className="mt-4 flex gap-3 flex-wrap">
                 {!profileData.emailVerified && (
                   <button
                     onClick={() => navigate('/verify-email')}
@@ -553,6 +553,18 @@ const ProfileView = () => {
                     Verify Aadhaar
                   </button>
                 )}
+                <button
+                  onClick={() => navigate('/wallet')}
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-md text-sm font-medium hover:from-emerald-600 hover:to-teal-600 shadow-md"
+                >
+                  My Wallet
+                </button>
+                <button
+                  onClick={() => navigate('/add-bank-account')}
+                  className="px-4 py-2 border border-emerald-600 text-emerald-600 rounded-md text-sm font-medium hover:bg-emerald-50"
+                >
+                  + Add Bank Account
+                </button>
               </div>
             </div>
 
